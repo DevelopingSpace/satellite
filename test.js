@@ -350,37 +350,32 @@ describe('Satellite()', () => {
     });
   });
 
-  test("isAuthenticated() + isAuthorized() without required role should fail", (done) => {
+  test('isAuthenticated() + isAuthorized() without required role should fail', (done) => {
     const service = createSatelliteInstance({
-      name: "test",
+      name: 'test',
     });
-    const token = createToken({ sub: "user@email.com", roles: ["user"] });
+    const token = createToken({ sub: 'user@email.com', roles: ['user'] });
     const adminToken = createToken({
-      sub: "admin-user@email.com",
-      roles: ["user", "admin"],
+      sub: 'admin-user@email.com',
+      roles: ['user', 'admin'],
     });
 
     const router = service.router;
-    router.get("/public", (req, res) => res.json({ hello: "public" }));
-    router.get(
-      "/protected",
-      isAuthenticated(),
-      isAuthorized({ roles: ["admin"] }),
-      (req, res) => {
-        // Make sure an admin user payload was added to req
-        expect(req.user.sub).toEqual("admin-user@email.com");
-        expect(Array.isArray(req.user.roles)).toBe(true);
-        expect(req.user.roles).toContain("admin");
-        res.json({ hello: "protected" });
-      }
-    );
+    router.get('/public', (req, res) => res.json({ hello: 'public' }));
+    router.get('/protected', isAuthenticated(), isAuthorized({ roles: ['admin'] }), (req, res) => {
+      // Make sure an admin user payload was added to req
+      expect(req.user.sub).toEqual('admin-user@email.com');
+      expect(Array.isArray(req.user.roles)).toBe(true);
+      expect(req.user.roles).toContain('admin');
+      res.json({ hello: 'protected' });
+    });
 
     service.start(port, async () => {
       // Public should need no bearer token
       let res = await fetch(`${url}/public`);
       expect(res.ok).toBe(true);
       let body = await res.json();
-      expect(body).toEqual({ hello: "public" });
+      expect(body).toEqual({ hello: 'public' });
 
       // Protected should fail without authorization header
       res = await fetch(`${url}/protected`);
@@ -404,7 +399,7 @@ describe('Satellite()', () => {
       });
       expect(res.ok).toBe(true);
       body = await res.json();
-      expect(body).toEqual({ hello: "protected" });
+      expect(body).toEqual({ hello: 'protected' });
 
       service.stop(done);
     });
@@ -626,7 +621,6 @@ describe('hash', () => {
   });
 });
 
-<<<<<<< HEAD
 describe('Create Error tests for Satellite', () => {
   test('should be an instance of type Error', () => {
     expect(createError(404, 'testing') instanceof Error).toBe(true);
@@ -636,16 +630,5 @@ describe('Create Error tests for Satellite', () => {
     const testError = createError(404, 'Satellite Test for Errors');
     expect(testError.status).toBe(404);
     expect(testError.message).toBe('Satellite Test for Errors');
-=======
-describe("Create Error tests for Satellite", () => {
-  test("should be an instance of type Error", () => {
-    expect(createError(404, "testing") instanceof Error).toBe(true);
-  });
-
-  test("should have it's value, and message accessible through it's members", () => {
-    const testError = createError(404, "Satellite Test for Errors");
-    expect(testError.status).toBe(404);
-    expect(testError.message).toBe("Satellite Test for Errors");
->>>>>>> c998284... Added createError module, fixed test.js
   });
 });
