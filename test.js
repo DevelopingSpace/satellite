@@ -16,9 +16,6 @@ const {
   createError,
   createServiceToken,
 } = require('./src');
-const redis = require('./src/redis');
-const RedisMock = require('ioredis-mock/lib');
-const { createRedisClient } = require('./src/redis');
 const { JWT_EXPIRES_IN, JWT_ISSUER, JWT_AUDIENCE, SECRET } = process.env;
 
 const createSatelliteInstance = (options) => {
