@@ -112,6 +112,82 @@ function errorHandler(err, req, res, next) {
   }
 }
 
+function setHttpCacheHeaders(cacheObj) {
+  /*
+ Level 1 - No Caching at all
+ Level 2 - Some caching, but for a small time window, 5 minutes
+ Level 3 - Regular Caching, store them for a year
+ Level 4 - Extreme Caching, store them forever
+ */
+
+  const options = cacheObj.options;
+  const levelValue = cacheObj.level;
+  const res = cacheObj.res;
+
+  // Enum the levels for readability
+  const levels = { LEVEL1: 1, LEVEL2: 2, LEVEL3: 3, LEVEL4: 4 };
+
+  if (level === null && options === null) {
+    next(
+      createError(
+        500,
+        'You passed in arguments that are of type NULL. Make sure the objects exist before calling the function.'
+      )
+    );
+  }
+
+  //If we want to explicitly set a bunch of headers at once, without using the default levels.
+  // Passed as a JSON Object with the following structure: {Cache-Control-Option : value }
+  if (level === null || level === 0) {
+    try {
+      for (var key in options) {
+        if (options.hasOwnProperty(key)) {
+          r.set('${key}', '${options[key]}');
+        }
+      }
+    } catch (error) {
+      next(
+        createError(
+          500,
+          "Unexpected Error: ${error}, check to see if you've made a mistake when defining options."
+        )
+      );
+    }
+  } else {
+    switch (levelValue) {
+      case LEVEL1:
+        res.set('Cache-Control', 'public, max-age=0');
+        break;
+      case LEVEL2:
+        res.set('Cache-Control', 'public, max-age=300');
+        break;
+      case LEVEL3:
+        res.set('Cache-Control', 'public, max-age=2592000');
+        break;
+      case LEVEL4:
+        res.set('Cache-Control', 'public, max-age=31536000, immutable');
+        break;
+    }
+    //Add any additional options left over from the user.
+    if (options != null) {
+      try {
+        for (var key in options) {
+          if (options.hasOwnProperty(key)) {
+            r.set('${key}', '${options[key]}');
+          }
+        }
+      } catch (error) {
+        next(
+          createError(
+            500,
+            "Unexpected Error: ${error}, check to see if you've made a mistake when defining options."
+          )
+        );
+      }
+    }
+  }
+}
 module.exports.isAuthenticated = isAuthenticated;
 module.exports.isAuthorized = isAuthorized;
 module.exports.errorHandler = errorHandler;
+module.exports.setHttpCacheHeaders = setHttpCacheHeaders;

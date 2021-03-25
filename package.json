@@ -27,7 +27,12 @@
     "express-pino-logger": "^6.0.0",
     "helmet": "4.4.1",
     "http-errors": "^1.8.0",
+<<<<<<< HEAD
     "jsonwebtoken": "^8.5.1",
+=======
+    "ioredis-mock": "^5.4.1",
+    "isomorphic-fetch": "^3.0.0",
+>>>>>>> c335c24... Created HttpHeader Functions
     "pino": "^6.11.2",
     "pino-colada": "^2.1.0"
   },
