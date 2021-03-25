@@ -31,8 +31,11 @@
     "jsonwebtoken": "^8.5.1",
 =======
     "ioredis-mock": "^5.4.1",
+<<<<<<< HEAD
     "isomorphic-fetch": "^3.0.0",
 >>>>>>> c335c24... Created HttpHeader Functions
+=======
+>>>>>>> 2c1d621... Clean up packages, code
     "pino": "^6.11.2",
     "pino-colada": "^2.1.0"
   },

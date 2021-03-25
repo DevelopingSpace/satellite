@@ -15,10 +15,13 @@ const {
   hash,
   createError,
 <<<<<<< HEAD
+<<<<<<< HEAD
   createServiceToken,
 =======
   Redis,
 >>>>>>> c335c24... Created HttpHeader Functions
+=======
+>>>>>>> 2c1d621... Clean up packages, code
 } = require('./src');
 const { throwIfCommandIsNotAllowed } = require('ioredis-mock/lib/command');
 const { setHttpCacheHeaders } = require('./src/middleware');
