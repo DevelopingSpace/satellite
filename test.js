@@ -23,7 +23,6 @@ const {
 =======
 >>>>>>> 2c1d621... Clean up packages, code
 } = require('./src');
-const { throwIfCommandIsNotAllowed } = require('ioredis-mock/lib/command');
 const { setHttpCacheHeaders } = require('./src/middleware');
 const { request } = require('http');
 const { JWT_EXPIRES_IN, JWT_ISSUER, JWT_AUDIENCE, SECRET } = process.env;
@@ -899,7 +898,7 @@ describe('Sets headers for a Response object', () => {
     });
     router = service.router;
     router.get('/public', (req, res) => {
-      setHttpHeaders({ res: res, level: 3 });
+      setHttpCacheHeaders({ res: res, level: 3 });
       expect(res.headers.get('Access-Control-Max-Age')).toBe('2592000');
     });
   });
@@ -909,7 +908,7 @@ describe('Sets headers for a Response object', () => {
     });
     router = service.router;
     router.get('/public', (req, res) => {
-      setHttpHeaders({
+      setHttpCacheHeaders({
         res: res,
         options: { 'content-type': 'image/jpeg', 'x-content-type-options': 'nosniff' },
         level: 3,
