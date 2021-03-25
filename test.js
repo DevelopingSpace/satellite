@@ -23,7 +23,6 @@ const {
 =======
 >>>>>>> 2c1d621... Clean up packages, code
 } = require('./src');
-const { setHttpCacheHeaders } = require('./src/middleware');
 const { request } = require('http');
 const { JWT_EXPIRES_IN, JWT_ISSUER, JWT_AUDIENCE, SECRET } = process.env;
 
@@ -918,5 +917,20 @@ describe('Sets headers for a Response object', () => {
       expect(res.headers.get('X-Content-Type-Options')).toBe('nosniff');
     });
 >>>>>>> c335c24... Created HttpHeader Functions
+  });
+  test('Allows us to use a custom time value for max-age', () => {
+    const service = createSatelliteInstance({
+      name: 'header-test-3',
+    });
+    router = service.router;
+    router.get('/public', (req, res) => {
+      setHttpCacheHeaders({
+        res: res,
+        options: { 'content-type': 'image/jpeg', 'x-content-type-options': 'nosniff' },
+        level: 5,
+        custom: 600,
+      });
+      expect(res.headers.get('Access-Control-Max-Age')).toBe('600');
+    });
   });
 });

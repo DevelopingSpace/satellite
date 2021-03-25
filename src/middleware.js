@@ -116,16 +116,17 @@ function setHttpCacheHeaders(cacheObj) {
   /*
  Level 1 - No Caching at all
  Level 2 - Some caching, but for a small time window, 5 minutes
- Level 3 - Regular Caching, store them for a year
+ Level 3 - Regular Caching, store them for a month
  Level 4 - Extreme Caching, store them forever
  */
 
   const options = cacheObj.options;
   const levelValue = cacheObj.level;
   const res = cacheObj.res;
+  const customTime = cacheObj.custom;
 
   // Enum the levels for readability
-  const levels = { LEVEL1: 1, LEVEL2: 2, LEVEL3: 3, LEVEL4: 4 };
+  const levels = { LEVEL1: 1, LEVEL2: 2, LEVEL3: 3, LEVEL4: 4, LEVEL5: 5 };
 
   if (level === null && options === null) {
     next(
@@ -166,6 +167,18 @@ function setHttpCacheHeaders(cacheObj) {
         break;
       case LEVEL4:
         res.set('Cache-Control', 'public, max-age=31536000, immutable');
+        break;
+      case LEVEL5:
+        if (customTime === null || typeof customTime !== 'number' || Number.isNaN(customTime)) {
+          next(
+            createError(
+              500,
+              "You passed a custom value that's not a number. Check the type of `custom`. "
+            )
+          );
+        } else {
+          res.set('Cache-Control', 'public, max-age=${customTime}');
+        }
         break;
     }
     //Add any additional options left over from the user.
