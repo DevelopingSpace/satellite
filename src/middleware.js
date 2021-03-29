@@ -1,6 +1,8 @@
 const jwt = require('express-jwt');
 const createError = require('http-errors');
 const logger = require('./logger');
+const ms = require('ms');
+const express = require('express');
 
 // JWT Validation Middleware. A user must have a valid bearer token.
 // We expect to get JWT config details via the env.
@@ -112,95 +114,64 @@ function errorHandler(err, req, res, next) {
   }
 }
 
-function setHttpCacheHeaders(cacheObj) {
+function cache(res) {
+  this.forever = (res) => {
+    const t = ms('1y');
+    //console.log(res);
+    res.headers.set(`Cache-Control`, `public, max-age=${t}, immutable`);
+    console.log(res.headers.get('Cache-Control'));
+  }; // Forever Function
+
   /*
- Level 1 - No Caching at all
- Level 2 - Some caching, but for a small time window, 5 minutes
- Level 3 - Regular Caching, store them for a month
- Level 4 - Extreme Caching, store them forever
- */
+no-store is needed with max-age=0
+we don't want to serve stale resources when Telescope is down.
+see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#requiring_revalidation
+*/
+  this.never = (res) => {
+    res.set('Cache-Control', 'public, no-store, max-age=0');
+  };
 
-  const options = cacheObj.options;
-  const levelValue = cacheObj.level;
-  const res = cacheObj.res;
-  const customTime = cacheObj.custom;
+  this.duration = (time, res) => {
+    const t = ms(time);
+    res.set('Cache-Control', 'public, max-age=${t}');
+  };
 
-  // Enum the levels for readability
-  const levels = { LEVEL1: 1, LEVEL2: 2, LEVEL3: 3, LEVEL4: 4, LEVEL5: 5 };
-
-  if (level === null && options === null) {
-    next(
-      createError(
-        500,
-        'You passed in arguments that are of type NULL. Make sure the objects exist before calling the function.'
-      )
-    );
-  }
-
-  //If we want to explicitly set a bunch of headers at once, without using the default levels.
-  // Passed as a JSON Object with the following structure: {Cache-Control-Option : value }
-  if (level === null || level === 0) {
-    try {
-      for (var key in options) {
-        if (options.hasOwnProperty(key)) {
-          r.set('${key}', '${options[key]}');
-        }
-      }
-    } catch (error) {
+  this.staleFor = (time, res) => {
+    if (res.headers.get('Cache-Control') !== null) {
+      const t = ms(time);
+      res.headers.append('Cache-Control', 'max-stale=${t}');
+    } else {
       next(
         createError(
-          500,
-          "Unexpected Error: ${error}, check to see if you've made a mistake when defining options."
+          428,
+          'You do not have a Cache-Control header, this function is used for attributes that contain the header. '
         )
       );
     }
-  } else {
-    switch (levelValue) {
-      case LEVEL1:
-        res.set('Cache-Control', 'public, max-age=0');
-        break;
-      case LEVEL2:
-        res.set('Cache-Control', 'public, max-age=300');
-        break;
-      case LEVEL3:
-        res.set('Cache-Control', 'public, max-age=2592000');
-        break;
-      case LEVEL4:
-        res.set('Cache-Control', 'public, max-age=31536000, immutable');
-        break;
-      case LEVEL5:
-        if (customTime === null || typeof customTime !== 'number' || Number.isNaN(customTime)) {
-          next(
-            createError(
-              500,
-              "You passed a custom value that's not a number. Check the type of `custom`. "
-            )
-          );
-        } else {
-          res.set('Cache-Control', 'public, max-age=${customTime}');
-        }
-        break;
+  };
+
+  this.freshFor = (time, res) => {
+    if (res.headers.get('Cache-Control') !== null) {
+      const t = ms(time);
+      res.headers.append('Cache-Control', 'min-fresh=${t}');
+    } else {
+      next(
+        createError(
+          428,
+          'You do not have a Cache-Control header, this function is used for attributes that contain the header. '
+        )
+      );
     }
-    //Add any additional options left over from the user.
-    if (options != null) {
-      try {
-        for (var key in options) {
-          if (options.hasOwnProperty(key)) {
-            r.set('${key}', '${options[key]}');
-          }
-        }
-      } catch (error) {
-        next(
-          createError(
-            500,
-            "Unexpected Error: ${error}, check to see if you've made a mistake when defining options."
-          )
-        );
-      }
-    }
-  }
+  };
+  return {
+    forever: this.forever,
+    never: this.never,
+    duration: this.duration,
+    staleFor: this.staleFor,
+    freshFor: this.freshFor,
+  };
 }
 module.exports.isAuthenticated = isAuthenticated;
 module.exports.isAuthorized = isAuthorized;
 module.exports.errorHandler = errorHandler;
-module.exports.setHttpCacheHeaders = setHttpCacheHeaders;
+module.exports.cache = cache;

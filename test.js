@@ -16,12 +16,16 @@ const {
   createError,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   createServiceToken,
 =======
   Redis,
 >>>>>>> c335c24... Created HttpHeader Functions
 =======
 >>>>>>> 2c1d621... Clean up packages, code
+=======
+  cache,
+>>>>>>> 418f2d5... Revamped Cache middleware
 } = require('./src');
 const { request } = require('http');
 const { JWT_EXPIRES_IN, JWT_ISSUER, JWT_AUDIENCE, SECRET } = process.env;
@@ -834,49 +838,42 @@ describe('Satellite()', () => {
       });
       helmetService.start(port, async () => {
         const res = await fetch(`${url}/always-200`);
+        // console.log(res);
         expect(res.ok).toBe(true);
         expect(res.headers.get('x-xss-protection')).toBe(null);
         helmetService.stop(done);
       });
     });
   });
-});
 
-describe('logger', () => {
-  test('logger should have expected methods()', () => {
-    ['trace', 'debug', 'info', 'warn', 'error', 'fatal'].forEach((level) => {
-      expect(typeof logger[level] === 'function').toBe(true);
-      expect(() => logger[level]('test')).not.toThrow();
+  describe('cache', () => {
+    test('forever() should set the max-age to 1y, and add the immutable tag', (done) => {
+      const service = createSatelliteInstance({
+        name: 'header-test',
+        port,
+      });
+      //router = service.router;
+      service.start(port, async () => {
+        const res = await fetch(`${url}/always-200`);
+        expect(res.ok).toBe(true);
+        cache().forever(res);
+        console.log(res.headers.get('Cache-Control'));
+        expect(res.headers.get('Cache-Control')).toBe('public, max-age=31557600000, immutable');
+        service.stop(done);
+      });
     });
   });
-});
 
-describe('hash', () => {
-  it('should return a 10 character hash value', () => {
-    expect(hash('satellite').length).toBe(10);
+  describe('logger', () => {
+    test('logger should have expected methods()', () => {
+      ['trace', 'debug', 'info', 'warn', 'error', 'fatal'].forEach((level) => {
+        expect(typeof logger[level] === 'function').toBe(true);
+        expect(() => logger[level]('test')).not.toThrow();
+      });
+    });
   });
 
-  it('should hash a string correctly', () => {
-    expect(hash('satellite')).toBe('dc4b4e203f');
-  });
-
-  it('should return a different hash if anything changes', () => {
-    expect(hash('satellite2')).toBe('6288d4ca65');
-  });
-});
-
-describe('Create Error tests for Satellite', () => {
-  test('should be an instance of type Error', () => {
-    expect(createError(404, 'testing') instanceof Error).toBe(true);
-  });
-
-  test("should have it's value, and message accessible through it's members", () => {
-    const testError = createError(404, 'Satellite Test for Errors');
-    expect(testError.status).toBe(404);
-    expect(testError.message).toBe('Satellite Test for Errors');
-  });
-});
-
+<<<<<<< HEAD
 <<<<<<< HEAD
 describe('createServiceToken()', () => {
   test('should create a service token', () => {
@@ -894,43 +891,32 @@ describe('Sets headers for a Response object', () => {
   test('Should set the object to Level 3 Caching', () => {
     const service = createSatelliteInstance({
       name: 'header-test',
+=======
+  describe('hash', () => {
+    it('should return a 10 character hash value', () => {
+      expect(hash('satellite').length).toBe(10);
+>>>>>>> 418f2d5... Revamped Cache middleware
     });
-    router = service.router;
-    router.get('/public', (req, res) => {
-      setHttpCacheHeaders({ res: res, level: 3 });
-      expect(res.headers.get('Access-Control-Max-Age')).toBe('2592000');
+
+    it('should hash a string correctly', () => {
+      expect(hash('satellite')).toBe('dc4b4e203f');
     });
-  });
-  test('Should allow us to set options unrelated to Cache-Control', () => {
-    const service = createSatelliteInstance({
-      name: 'header-test-2',
-    });
-    router = service.router;
-    router.get('/public', (req, res) => {
-      setHttpCacheHeaders({
-        res: res,
-        options: { 'content-type': 'image/jpeg', 'x-content-type-options': 'nosniff' },
-        level: 3,
-      });
-      expect(res.headers.get('Access-Control-Max-Age')).toBe('2592000');
-      expect(res.headers.get('Content-Type')).toBe('image/jpeg');
-      expect(res.headers.get('X-Content-Type-Options')).toBe('nosniff');
+
+    it('should return a different hash if anything changes', () => {
+      expect(hash('satellite2')).toBe('6288d4ca65');
     });
 >>>>>>> c335c24... Created HttpHeader Functions
   });
-  test('Allows us to use a custom time value for max-age', () => {
-    const service = createSatelliteInstance({
-      name: 'header-test-3',
+
+  describe('Create Error tests for Satellite', () => {
+    test('should be an instance of type Error', () => {
+      expect(createError(404, 'testing') instanceof Error).toBe(true);
     });
-    router = service.router;
-    router.get('/public', (req, res) => {
-      setHttpCacheHeaders({
-        res: res,
-        options: { 'content-type': 'image/jpeg', 'x-content-type-options': 'nosniff' },
-        level: 5,
-        custom: 600,
-      });
-      expect(res.headers.get('Access-Control-Max-Age')).toBe('600');
+
+    test("should have it's value, and message accessible through it's members", () => {
+      const testError = createError(404, 'Satellite Test for Errors');
+      expect(testError.status).toBe(404);
+      expect(testError.message).toBe('Satellite Test for Errors');
     });
   });
 });

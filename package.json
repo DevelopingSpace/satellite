@@ -28,6 +28,7 @@
     "helmet": "4.4.1",
     "http-errors": "^1.8.0",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "jsonwebtoken": "^8.5.1",
 =======
     "ioredis-mock": "^5.4.1",
@@ -36,6 +37,9 @@
 >>>>>>> c335c24... Created HttpHeader Functions
 =======
 >>>>>>> 2c1d621... Clean up packages, code
+=======
+    "ms": "^2.1.3",
+>>>>>>> 418f2d5... Revamped Cache middleware
     "pino": "^6.11.2",
     "pino-colada": "^2.1.0"
   },

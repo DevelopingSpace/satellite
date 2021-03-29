@@ -1,6 +1,6 @@
 require('./apm');
 
-const { isAuthenticated, isAuthorized } = require('./middleware');
+const { isAuthenticated, isAuthorized, cache } = require('./middleware');
 const { createRouter } = require('./app');
 
 module.exports.Satellite = require('./satellite');
@@ -11,3 +11,4 @@ module.exports.createServiceToken = require('./service-token');
 module.exports.Router = (options) => createRouter(options);
 module.exports.isAuthenticated = isAuthenticated;
 module.exports.isAuthorized = isAuthorized;
+module.exports.cache = cache;
