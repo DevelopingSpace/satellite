@@ -852,13 +852,38 @@ describe('Satellite()', () => {
         name: 'header-test',
         port,
       });
-      //router = service.router;
       service.start(port, async () => {
         const res = await fetch(`${url}/always-200`);
         expect(res.ok).toBe(true);
         cache().forever(res);
-        console.log(res.headers.get('Cache-Control'));
         expect(res.headers.get('Cache-Control')).toBe('public, max-age=31557600000, immutable');
+        service.stop(done);
+      });
+    });
+    test('never() should set max-age to 0, and contain no-store', (done) => {
+      const service = createSatelliteInstance({
+        name: 'header-test-2',
+        port,
+      });
+      service.start(port, async () => {
+        const res = await fetch(`${url}/always-200`);
+        expect(res.ok).toBe(true);
+        cache().never(res);
+        expect(res.headers.get('Cache-Control')).toBe('public, no-store, max-age=0');
+        service.stop(done);
+      });
+    });
+
+    test('duration() should set max-age to a certain value', (done) => {
+      const service = createSatelliteInstance({
+        name: 'header-test-3',
+        port,
+      });
+      service.start(port, async () => {
+        const res = await fetch(`${url}/always-200`);
+        expect(res.ok).toBe(true);
+        cache().duration('1d', res);
+        expect(res.headers.get('Cache-Control')).toBe('public, max-age=86400000');
         service.stop(done);
       });
     });

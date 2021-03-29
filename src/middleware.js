@@ -117,9 +117,7 @@ function errorHandler(err, req, res, next) {
 function cache(res) {
   this.forever = (res) => {
     const t = ms('1y');
-    //console.log(res);
     res.headers.set(`Cache-Control`, `public, max-age=${t}, immutable`);
-    console.log(res.headers.get('Cache-Control'));
   }; // Forever Function
 
   /*
@@ -128,18 +126,18 @@ we don't want to serve stale resources when Telescope is down.
 see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#requiring_revalidation
 */
   this.never = (res) => {
-    res.set('Cache-Control', 'public, no-store, max-age=0');
+    res.headers.set('Cache-Control', 'public, no-store, max-age=0');
   };
 
   this.duration = (time, res) => {
     const t = ms(time);
-    res.set('Cache-Control', 'public, max-age=${t}');
+    res.headers.set('Cache-Control', `public, max-age=${t}`);
   };
 
   this.staleFor = (time, res) => {
     if (res.headers.get('Cache-Control') !== null) {
       const t = ms(time);
-      res.headers.append('Cache-Control', 'max-stale=${t}');
+      res.headers.append('Cache-Control', `max-stale=${t}`);
     } else {
       next(
         createError(
@@ -153,7 +151,7 @@ see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#req
   this.freshFor = (time, res) => {
     if (res.headers.get('Cache-Control') !== null) {
       const t = ms(time);
-      res.headers.append('Cache-Control', 'min-fresh=${t}');
+      res.headers.append('Cache-Control', `min-fresh=${t}`);
     } else {
       next(
         createError(
