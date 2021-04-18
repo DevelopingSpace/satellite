@@ -1,6 +1,6 @@
 require('./apm');
 
-const { isAuthenticated, isAuthorized } = require('./middleware');
+const { isAuthenticated, isAuthorized, corsDelegate } = require('./middleware');
 const { createRouter } = require('./app');
 
 module.exports.Satellite = require('./satellite');
