@@ -21,6 +21,7 @@
     "@elastic/ecs-pino-format": "^1.0.0",
     "@godaddy/terminus": "^4.7.0",
     "cors": "2.8.5",
+    "detect-browser": "^5.2.0",
     "elastic-apm-node": "^3.12.1",
     "express": "4.17.1",
     "express-jwt": "^6.0.0",

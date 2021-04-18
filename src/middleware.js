@@ -1,5 +1,7 @@
 const jwt = require('express-jwt');
 const createError = require('http-errors');
+const { detect } = require('detect-browser');
+const browser = detect();
 const logger = require('./logger');
 
 // JWT Validation Middleware. A user must have a valid bearer token.
@@ -113,11 +115,32 @@ function errorHandler(err, req, res, next) {
 }
 
 function corsDelegate(req, callback, options) {
-  var corsOptions = options;
+  var corsOptions;
   corsOptions['origin'] = true;
+  try {
+    if (options[exposedHeaders].includes('*')) {
+      if (
+        (browser.os === 'Android OS' && browser.name === 'firefox') ||
+        browser === 'safari' ||
+        browser === 'ios'
+      ) {
+        next(
+          createError(
+            500,
+            'You cannot use the Wildcard Header on exposedHeaders for your OS., Pass in you exposed headers explicitly.'
+          )
+        );
+      }
+    }
+    if (options['maxAge'] < 0) {
+      next(createError('Cannot have a maxAge value thats below 0'));
+    }
+  } catch (e) {}
+
   callback(null, corsOptions);
 }
 
 module.exports.isAuthenticated = isAuthenticated;
 module.exports.isAuthorized = isAuthorized;
 module.exports.errorHandler = errorHandler;
+module.exports.corsDelegate = corsDelegate;
