@@ -115,10 +115,8 @@ function errorHandler(err, req, res, next) {
 }
 
 function corsDelegate(req, callback, options) {
-  var corsOptions;
-  corsOptions['origin'] = true;
   try {
-    if (options[exposedHeaders].includes('*')) {
+    if (options['exposedHeaders'].includes('*') || options['allowedHeaders'].includes('*')) {
       if (
         (browser.os === 'Android OS' && browser.name === 'firefox') ||
         browser === 'safari' ||
@@ -137,7 +135,7 @@ function corsDelegate(req, callback, options) {
     }
   } catch (e) {}
 
-  callback(null, corsOptions);
+  callback(null, options);
 }
 
 module.exports.isAuthenticated = isAuthenticated;
