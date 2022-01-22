@@ -1,3 +1,15 @@
 {
-  "extends": ["config:base"]
+  "extends": ["config:base"],
+  "dependencyDashboard": true,
+  "major": {
+    "dependencyDashboardApproval": true
+  },
+  "labels": ["dependencies"],
+  "timezone": "America/Toronto",
+  "reviewers": ["Seneca-CDOT/telescope-maintainers"],
+  "includeForks": false,
+  "rebaseWhen": "never",
+  "schedule": ["every weekend"],
+  "prConcurrentLimit": 1,
+  "prHourlyLimit": 1
 }
