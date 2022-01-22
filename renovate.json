@@ -1,6 +1,7 @@
 {
   "extends": ["config:base"],
   "dependencyDashboard": true,
+  "packageRules": [{ "matchPackagePatterns": ["node-fetch"], "allowedVersions": "<3.0" }],
   "major": {
     "dependencyDashboardApproval": true
   },
