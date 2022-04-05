@@ -1,6 +1,8 @@
-# Satellite
+_**Satellite has moved to the Telescope repository. You can find the project [here](https://github.com/Seneca-CDOT/telescope/tree/master/src/satellite).**_
 
-![node-js-ci](https://github.com/Seneca-CDOT/satellite/workflows/node-js-ci/badge.svg)
+---
+
+# Satellite
 
 A Microservice Framework for [Telescope](https://github.com/Seneca-CDOT/telescope).
 Because Ray said we should try microservices!
